@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,12 +22,10 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-/**
- * @author Spencer Gibb
- */
-@SpringBootConfiguration
+
+@Configuration
 @EnableAutoConfiguration
-@Import(AdditionalRoutes.class)
+@Import(Bucket4jGatewayFilter.class)
 public class GatewayRoutes{
 
     public static final String HELLO_FROM_FAKE_ACTUATOR_METRICS_GATEWAY_REQUESTS = "hello from fake /actuator/metrics/spring.cloud.gateway.requests";
@@ -123,7 +122,7 @@ public class GatewayRoutes{
                 .route(r -> r.order(-1)
                         .host("**.throttle.org").and().path("/get")
                         .filters(f -> f.prefixPath("/httpbin")
-                                .filter(new ThrottleGatewayFilter()
+                                .filter(new Bucket4jGatewayFilter()
                                         .setCapacity(1)
                                         .setRefillTokens(1)
                                         .setRefillPeriod(10)
@@ -170,5 +169,3 @@ public class GatewayRoutes{
     }
 
 }
-
-
